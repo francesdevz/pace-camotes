@@ -1,0 +1,10 @@
+{
+  "name": "pace-camotes",
+  "private": true,
+  "type": "module",
+  "description": "PACE Camotes website with court booking and admin dashboard",
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "@supabase/supabase-js": "2.117.3"
+  }
+}

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Bookings · PACE Camotes Admin</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0B0C1E">
+  <link rel="icon" type="image/png" href="/assets/logo.png">
+  <link rel="apple-touch-icon" href="/assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,300..900;1,62..125,300..900&amp;family=Instrument+Serif:ital@0;1&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-page">
+<div class="grain" aria-hidden="true"></div>
+<header class="hdr">
+  <div class="gut">
+    <a class="brand" href="/"><img src="/assets/logo.png" alt=""><b>PACE<span>CAMOTES · ADMIN</span></b></a>
+    <div class="hdr-r"><button class="btn btn-line btn-sm" type="button" id="logoutBtn" hidden style="display:inline-flex">Sign out</button></div>
+  </div>
+</header>
+
+<main class="login gut" id="login" hidden>
+  <form class="login-card" id="loginForm" novalidate>
+    <p class="label volt">Staff only</p>
+    <h1 class="disp">Bookings</h1>
+    <div class="field"><label class="label" for="pw">Admin password</label><input type="password" id="pw" autocomplete="current-password" required></div>
+    <button class="btn btn-volt" type="submit" id="loginBtn">Sign in</button>
+    <p class="note" id="loginMsg" aria-live="polite"></p>
+  </form>
+</main>
+
+<!-- ================= ADMIN DASHBOARD ================= -->
+<section class="admin gut" id="admin" hidden aria-label="Bookings dashboard">
+  <div class="max">
+    <div class="ad-head">
+      <div>
+        <p class="label volt">Admin · Court bookings</p>
+        <h1 class="ad-title">Bookings</h1>
+        <p class="ad-sub" id="adToday"></p>
+      </div>
+      <div class="ad-actions">
+        <a class="btn btn-line btn-sm" href="/">View site</a>
+        <button class="btn btn-line btn-sm" type="button" id="exportBtn">Export CSV</button>
+        <button class="btn btn-solid btn-sm" type="button" id="newBtn">New booking</button>
+      </div>
+    </div>
+    <p class="ad-alert" id="adAlert" hidden></p>
+
+    <div class="kpis">
+      <div class="kpi kpi-pending"><span class="label">Waiting for approval</span><strong id="kPending">–</strong><small id="kPendingSub">upcoming requests</small></div>
+      <div class="kpi"><span class="label">Approved upcoming</span><strong id="kApproved">–</strong><small>confirmed bookings</small></div>
+      <div class="kpi"><span class="label">Courts used today</span><strong id="kToday">–</strong><div class="meter"><span id="kTodayBar"></span></div></div>
+      <div class="kpi"><span class="label">Requests · last 7 days</span><strong id="kWeek">–</strong><small id="kWeekSub">new requests</small></div>
+    </div>
+
+    <div class="cal-card ad-cal">
+      <div class="cal-head">
+        <div><h3>Court calendar</h3><span class="wk" id="calWeek"></span></div>
+        <div class="cal-nav">
+          <button type="button" id="calPrev" aria-label="Previous week"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+          <button type="button" id="calToday">Today</button>
+          <button type="button" id="calNext" aria-label="Next week"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+        </div>
+      </div>
+      <div class="cal-scroll" id="cal"></div>
+      <div id="calLegend"></div>
+    </div>
+
+    <div class="ad-grid">
+      <div class="card list">
+        <div class="card-head wrap">
+          <div class="tabs" role="tablist" id="tabs"></div>
+          <div class="filters">
+            <label class="sr" for="fWhen">Period</label>
+            <select id="fWhen"><option value="upcoming">Upcoming</option><option value="today">Today</option><option value="past">Past</option><option value="all">All dates</option></select>
+            <label class="sr" for="fQ">Search</label>
+            <input id="fQ" type="search" placeholder="Search name or number">
+          </div>
+        </div>
+        <div class="tbl-scroll">
+          <table class="bk">
+            <thead><tr><th>When</th><th>Guest</th><th>Format</th><th>Source</th><th>Status</th><th class="r">Actions</th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+        <p class="empty" id="empty" hidden></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- booking detail drawer -->
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" hidden aria-label="Booking details">
+  <div class="dr-head"><p class="label">Booking</p><button class="icon-btn" type="button" id="drClose" aria-label="Close details"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div id="drBody"></div>
+</aside>
+
+<!-- new booking dialog -->
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <form class="modal-card" id="mForm" novalidate>
+    <div class="dr-head"><h2 id="mTitle">New booking</h2><button class="icon-btn" type="button" id="mClose" aria-label="Close"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <p class="m-hint">For walk-ins, calls, Messenger requests and Open Play sessions.</p>
+    <div class="fields">
+      <div class="field"><label class="label" for="mKind">Type</label><select id="mKind"><option value="booking">Court booking</option><option value="openplay">Open Play block</option></select></div>
+      <div class="field"><label class="label" for="mHours">Hours</label><select id="mHours"><option value="1">1 hour</option><option value="2">2 hours</option><option value="3">3 hours</option><option value="4">4 hours</option><option value="5">5 hours</option><option value="6">6 hours</option></select></div>
+      <div class="field"><label class="label" for="mDate">Date</label><input type="date" id="mDate" required></div>
+      <div class="field"><label class="label" for="mTime">Time</label><select id="mTime"></select></div>
+      <div class="field"><label class="label" for="mName">Name</label><input id="mName" maxlength="80" required></div>
+      <div class="field bk-only"><label class="label" for="mPhone">Mobile or Messenger</label><input id="mPhone" maxlength="80"></div>
+      <div class="field bk-only"><label class="label" for="mFormat">Format</label><select id="mFormat"><option>Doubles · 4 players</option><option>Singles · 2 players</option><option>Open play</option><option>Clinic</option></select></div>
+      <div class="field bk-only"><label class="label" for="mSource">Source</label><select id="mSource"><option>Messenger</option><option>Walk-in</option><option>Phone</option></select></div>
+      <div class="field bk-only"><label class="label" for="mStatus">Status</label><select id="mStatus"><option value="approved">Booked</option><option value="pending">Pencil booked</option></select></div>
+      <div class="field"><label class="label" for="mNote">Note</label><input id="mNote" maxlength="200"></div>
+    </div>
+    <p class="note" id="mMsg" aria-live="polite"></p>
+    <button class="btn btn-solid" type="submit" id="mSave">Save booking</button>
+  </form>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="/js/calendar.js" defer></script>
+<script src="/js/admin.js" defer></script>
+</body>
+</html>
